@@ -11,5 +11,6 @@
 #include <tuple>
 #include <optional>
 #include <array>
+#include <algorithm>
 
 #include <vulkan/vulkan.h>
