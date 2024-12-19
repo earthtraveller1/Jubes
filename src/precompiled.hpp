@@ -9,5 +9,6 @@
 #include <cstdint>
 #include <cmath>
 #include <tuple>
+#include <optional>
 
 #include <vulkan/vulkan.h>
