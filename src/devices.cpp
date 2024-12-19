@@ -63,7 +63,26 @@ std::optional<PhysicalDevice> pick_physical_device(VkInstance p_instance,
             }
         }
 
-        if (graphics_family.has_value() && present_family.has_value()) {
+        uint32_t device_extension_count;
+        vkEnumerateDeviceExtensionProperties(device, nullptr,
+                                             &device_extension_count, nullptr);
+
+        std::vector<VkExtensionProperties> device_extensions(
+            device_extension_count);
+        vkEnumerateDeviceExtensionProperties(
+            device, nullptr, &device_extension_count, device_extensions.data());
+
+        bool has_swapchain_support = false;
+
+        for (const auto &extension : device_extensions) {
+            if (std::string_view{extension.extensionName} ==
+                std::string_view{VK_KHR_SWAPCHAIN_EXTENSION_NAME}) {
+                has_swapchain_support = true;
+            }
+        }
+
+        if (graphics_family.has_value() && present_family.has_value() &&
+            has_swapchain_support) {
             return PhysicalDevice{device, graphics_family.value(),
                                   present_family.value()};
         }
@@ -173,16 +192,19 @@ Device::Device(GLFWwindow *const p_window, bool p_enable_validation) {
 
     const VkPhysicalDeviceFeatures device_features{};
 
+    const std::array extensions{VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+
     const VkDeviceCreateInfo device_info{
         .sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO,
         .pNext = nullptr,
         .flags = 0,
-        .queueCreateInfoCount = static_cast<uint32_t>(queue_create_infos.size()),
+        .queueCreateInfoCount =
+            static_cast<uint32_t>(queue_create_infos.size()),
         .pQueueCreateInfos = queue_create_infos.data(),
         .enabledLayerCount = 0,
         .ppEnabledLayerNames = nullptr,
-        .enabledExtensionCount = 0,
-        .ppEnabledExtensionNames = nullptr,
+        .enabledExtensionCount = extensions.size(),
+        .ppEnabledExtensionNames = extensions.data(),
         .pEnabledFeatures = &device_features,
     };
 

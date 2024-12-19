@@ -10,5 +10,6 @@
 #include <cmath>
 #include <tuple>
 #include <optional>
+#include <array>
 
 #include <vulkan/vulkan.h>
