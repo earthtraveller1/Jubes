@@ -3,6 +3,8 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 
+#include "devices.hpp"
+
 constexpr auto WINDOW_WIDTH = 1280;
 constexpr auto WINDOW_HEIGHT = 720;
 
@@ -21,11 +23,20 @@ int main() {
 
     const auto window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Jubes",
                                          nullptr, nullptr);
+
     if (window == nullptr) {
         fmt::println("Failed to create the GLFW window.");
         return EXIT_FAILURE;
     }
 
+    Device device{};
+    try {
+        device = Device {window, true};
+    } catch (Error error) {
+        fmt::println("[ERROR]: Failed to create the device: {}", error);
+        return EXIT_FAILURE;
+    }
+    
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
     }
