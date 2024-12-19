@@ -9,7 +9,17 @@ class Device {
     Device(GLFWwindow *const window, bool enable_validation);
     Device &operator=(Device&& rhs) noexcept;
 
-    NO_COPY(Device)
+    NO_COPY(Device);
+
+    inline VkDevice get() const { return device; }
+
+    inline VkPhysicalDevice get_physical() const { return physical_device; }
+
+    inline VkSurfaceKHR get_surface() const { return surface; }
+
+    inline uint32_t get_graphics_family() const { return graphics_family; }
+
+    inline uint32_t get_present_family() const { return present_family; }
 
     ~Device();
 
