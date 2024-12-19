@@ -1,9 +1,10 @@
 #include "common.hpp"
 
 fmt::format_context::iterator
-fmt::formatter<VkResult>::format(VkResult p_result, format_context &p_ctx) const {
+fmt::formatter<VkResult>::format(VkResult p_result,
+                                 format_context &p_ctx) const {
     std::string_view result;
-    
+
     switch (p_result) {
     case VK_SUCCESS:
         result = "VK_SUCCESS";
@@ -76,6 +77,28 @@ fmt::formatter<VkResult>::format(VkResult p_result, format_context &p_ctx) const
         break;
     case VK_RESULT_MAX_ENUM:
         result = "VK_RESULT_MAX_ENUM";
+        break;
+    }
+
+    return fmt::formatter<std::string_view>::format(result, p_ctx);
+}
+
+fmt::format_context::iterator
+fmt::formatter<Error>::format(Error p_result, format_context &p_ctx) const {
+    std::string_view result;
+
+    switch (p_result) {
+    case Error::Ok:
+        result = "Error::Ok";
+        break;
+    case Error::VulkanError:
+        result = "Error::VulkanError";
+        break;
+    case Error::NoValidationLayers:
+        result = "Error::NoValidationLayers";
+        break;
+    case Error::NoAdequatePhysicalDeviceError:
+        result = "Error::NoAdequatePhysicalDeviceError";
         break;
     }
 
