@@ -1,8 +1,9 @@
 target_sources(
 	Jubes PRIVATE
 
-	main.cpp
+	common.cpp
 	devices.cpp
+	main.cpp
 
 	common.hpp
 	devices.hpp
