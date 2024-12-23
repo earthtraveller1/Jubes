@@ -110,9 +110,51 @@ Swapchain::Swapchain(const Device &p_device, GLFWwindow *p_window)
     vkGetSwapchainImagesKHR(p_device.get(), swapchain, &image_count, nullptr);
 
     images.resize(image_count);
-    vkGetSwapchainImagesKHR(p_device.get(), swapchain, &image_count, images.data());
+    vkGetSwapchainImagesKHR(p_device.get(), swapchain, &image_count,
+                            images.data());
+
+    image_views.reserve(image_count);
+
+    for (const auto image : images) {
+        const VkImageViewCreateInfo view_info{
+            .sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .image = image,
+            .viewType = VK_IMAGE_VIEW_TYPE_2D,
+            .format = surface_format.format,
+            .components =
+                {
+                    .r = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .g = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .b = VK_COMPONENT_SWIZZLE_IDENTITY,
+                    .a = VK_COMPONENT_SWIZZLE_IDENTITY,
+                },
+            .subresourceRange =
+                {
+                    .aspectMask = VK_IMAGE_ASPECT_COLOR_BIT,
+                    .baseMipLevel = 0,
+                    .levelCount = 1,
+                    .baseArrayLayer = 0,
+                    .layerCount = 1,
+                },
+        };
+
+        VkImageView view;
+        result = vkCreateImageView(device.get(), &view_info, nullptr, &view);
+        if (result != VK_SUCCESS) {
+            fmt::println("[ERROR]: Failed to create an image view. Error: {}", result);
+            throw Error::VulkanError;
+        }
+
+        image_views.push_back(view);
+    }
 }
 
 Swapchain::~Swapchain() {
+    for (const auto view : image_views) {
+        vkDestroyImageView(device.get(), view, nullptr);
+    }
+
     vkDestroySwapchainKHR(device.get(), swapchain, nullptr);
 }

@@ -19,4 +19,5 @@ class Swapchain {
         VkExtent2D extent;
 
         std::vector<VkImage> images;
+        std::vector<VkImageView> image_views;
 };
