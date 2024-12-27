@@ -16,6 +16,5 @@ template <> struct fmt::formatter<Error> : fmt::formatter<std::string_view> {
 };
 
 #define NO_COPY(type)                                                          \
-    type() = default;                                                          \
     type(type &) = delete;                                                     \
     type &operator=(type &) = delete;
