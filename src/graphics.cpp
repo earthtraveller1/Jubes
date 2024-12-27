@@ -1,5 +1,6 @@
 #include "graphics.hpp"
 #include "present.hpp"
+#include <vulkan/vulkan_core.h>
 
 RenderPass::RenderPass(const Device &p_device, const Swapchain &p_swapchain)
     : device(p_device) {
@@ -51,5 +52,35 @@ RenderPass::RenderPass(const Device &p_device, const Swapchain &p_swapchain)
     if (result != VK_SUCCESS) {
         fmt::println("[ERROR]: Failed to create a render pass: {}", result);
         throw Error::VulkanError;
+    }
+}
+
+Framebuffers::Framebuffers(const Device &p_device, const Swapchain &p_swapchain,
+                           const RenderPass &p_render_pass)
+    : device(p_device) {
+    framebuffers.reserve(p_swapchain.get_image_views().size());
+
+    for (const auto image_view : p_swapchain.get_image_views()) {
+        const VkFramebufferCreateInfo fb_info{
+            .sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO,
+            .pNext = nullptr,
+            .flags = 0,
+            .renderPass = p_render_pass.get(),
+            .attachmentCount = 1,
+            .pAttachments = &image_view,
+            .width = p_swapchain.get_extent().width,
+            .height = p_swapchain.get_extent().height,
+            .layers = 1,
+        };
+
+        VkFramebuffer fb;
+        const auto result =
+            vkCreateFramebuffer(p_device.get(), &fb_info, nullptr, &fb);
+        if (result != VK_SUCCESS) {
+            fmt::println("[ERROR]: Failed to create a framebuffer: {}", result);
+            throw Error::VulkanError;
+        }
+
+        framebuffers.push_back(fb);
     }
 }
