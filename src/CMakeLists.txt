@@ -3,11 +3,13 @@ target_sources(
 
 	"common.cpp"
 	"devices.cpp"
+    "graphics.cpp"
 	"main.cpp"
 	"present.cpp"
 
 	"common.hpp"
 	"devices.hpp"
+    "graphics.hpp"
 	"precompiled.hpp"
 	"present.hpp"
 )
