@@ -106,12 +106,15 @@ Swapchain::Swapchain(const Device &p_device, GLFWwindow *p_window)
         throw Error::VulkanError;
     }
 
-    uint32_t image_count;
-    vkGetSwapchainImagesKHR(p_device.get(), swapchain, &image_count, nullptr);
+    {
+        uint32_t image_count;
+        vkGetSwapchainImagesKHR(p_device.get(), swapchain, &image_count,
+                                nullptr);
 
-    images.resize(image_count);
-    vkGetSwapchainImagesKHR(p_device.get(), swapchain, &image_count,
-                            images.data());
+        images.resize(image_count);
+        vkGetSwapchainImagesKHR(p_device.get(), swapchain, &image_count,
+                                images.data());
+    }
 
     image_views.reserve(image_count);
 
@@ -143,7 +146,8 @@ Swapchain::Swapchain(const Device &p_device, GLFWwindow *p_window)
         VkImageView view;
         result = vkCreateImageView(device.get(), &view_info, nullptr, &view);
         if (result != VK_SUCCESS) {
-            fmt::println("[ERROR]: Failed to create an image view. Error: {}", result);
+            fmt::println("[ERROR]: Failed to create an image view. Error: {}",
+                         result);
             throw Error::VulkanError;
         }
 
