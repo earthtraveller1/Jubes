@@ -9,6 +9,8 @@ class Swapchain {
 
     NO_COPY(Swapchain)
 
+    inline VkFormat get_format() const { return image_format; }
+
     ~Swapchain();
 
     private:
