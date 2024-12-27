@@ -4,11 +4,12 @@
 #include <fmt/format.h>
 
 #include "devices.hpp"
+#include "present.hpp"
 
 constexpr auto WINDOW_WIDTH = 1280;
 constexpr auto WINDOW_HEIGHT = 720;
 
-int main() {
+int main() try {
     if (!glfwInit()) {
         fmt::println("Failed to initialize GLFW.");
         return EXIT_FAILURE;
@@ -29,14 +30,9 @@ int main() {
         return EXIT_FAILURE;
     }
 
-    Device device{};
-    try {
-        device = Device {window, true};
-    } catch (Error error) {
-        fmt::println("[ERROR]: Failed to create the device: {}", error);
-        return EXIT_FAILURE;
-    }
-    
+    Device device{window, true};
+    Swapchain swapchain{device, window};
+
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
     }
@@ -44,4 +40,6 @@ int main() {
     glfwDestroyWindow(window);
     glfwTerminate();
     return 0;
+} catch (Error error) {
+    fmt::println("[ERROR]: {}", error);
 }
