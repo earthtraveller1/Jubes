@@ -12,5 +12,6 @@
 #include <optional>
 #include <array>
 #include <algorithm>
+#include <span>
 
 #include <vulkan/vulkan.h>
