@@ -22,15 +22,20 @@ FetchContent_Declare(
 	GIT_REPOSITORY "https://github.com/fmtlib/fmt"
 	GIT_TAG "0c9fce2ffefecfdce794e1859584e25877b7b592"
 )
+FetchContent_Declare(
+	glm
+	GIT_REPOSITORY "https://github.com/g-truc/glm.git"
+	GIT_TAG "0af55ccecd98d4e5a8d1fad7de25ba429d60e863"
+)
 
-FetchContent_MakeAvailable(glfw fmt)
+FetchContent_MakeAvailable(glfw fmt glm)
 find_package(Vulkan)
 
 # Add source to this project's executable.
 add_executable (Jubes)
 add_subdirectory("src")
 
-target_link_libraries(Jubes PRIVATE glfw fmt Vulkan::Vulkan)
+target_link_libraries(Jubes PRIVATE glfw fmt glm Vulkan::Vulkan)
 if (MSVC)
 	target_compile_options(Jubes PRIVATE /W4)
 else()
