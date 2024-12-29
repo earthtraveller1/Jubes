@@ -100,7 +100,25 @@ fmt::formatter<Error>::format(Error p_result, format_context &p_ctx) const {
     case Error::NoAdequatePhysicalDeviceError:
         result = "Error::NoAdequatePhysicalDeviceError";
         break;
+    case Error::FileOpenError:
+        result = "Error::FileOpenError";
+        break;
     }
 
     return fmt::formatter<std::string_view>::format(result, p_ctx);
+}
+
+auto read_as_bytes(std::string_view file_name) -> std::vector<char> {
+    std::ifstream file(file_name.data(), std::ios::ate | std::ios::binary);
+
+    if (!file.is_open()) {
+        throw Error::FileOpenError;
+    }
+
+    const auto file_size = file.tellg();
+    std::vector<char> buffer(file_size);
+    file.seekg(0);
+    file.read(buffer.data(), file_size);
+
+    return buffer;
 }
