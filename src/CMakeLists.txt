@@ -1,12 +1,14 @@
 target_sources(
 	Jubes PRIVATE
 
+    "buffers.cpp"
 	"common.cpp"
 	"devices.cpp"
     "graphics.cpp"
 	"main.cpp"
 	"present.cpp"
 
+    "buffers.hpp"
 	"common.hpp"
 	"devices.hpp"
     "graphics.hpp"
