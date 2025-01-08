@@ -153,6 +153,8 @@ Swapchain::Swapchain(const Device &p_device, GLFWwindow *p_window)
 
         image_views.push_back(view);
     }
+
+    image_format = surface_format.format;
 }
 
 Swapchain::~Swapchain() {

@@ -91,7 +91,7 @@ GraphicsPipeline::GraphicsPipeline(
     std::string_view p_fragment_shader_path,
     std::span<const VkPushConstantRange> push_constant_ranges,
     std::span<const VkDescriptorSetLayout> p_descriptor_set_layouts)
-    : device(p_device), render_pass(p_render_pass) {
+    : render_pass(p_render_pass), device(p_device) {
     const VkPipelineLayoutCreateInfo pipeline_layout_create_info{
         .sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
         .pNext = nullptr,
@@ -104,9 +104,8 @@ GraphicsPipeline::GraphicsPipeline(
         .pPushConstantRanges = push_constant_ranges.data(),
     };
 
-    auto result =
-        vkCreatePipelineLayout(p_device.get(), &pipeline_layout_create_info,
-                               nullptr, &layout);
+    auto result = vkCreatePipelineLayout(
+        p_device.get(), &pipeline_layout_create_info, nullptr, &layout);
 
     if (result != VK_SUCCESS) {
         fmt::println("[ERROR]: Failed to create the Vulkan pipeline layout: {}",
