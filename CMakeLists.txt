@@ -35,6 +35,16 @@ find_package(Vulkan)
 add_executable (Jubes)
 add_subdirectory("src")
 
+file(GLOB SHADERS shaders/*.vert shaders/*.frag)
+foreach(SHADER ${SHADERS})
+    add_custom_command(
+        OUTPUT ${SHADER}.spv
+        COMMAND glslc -o ${SHADER}.spv ${SHADER}
+        DEPENDS ${SHADER}
+    )
+    target_sources(${PROJECT_NAME} PRIVATE ${SHADER}.spv)
+endforeach()
+
 target_link_libraries(Jubes PRIVATE glfw fmt glm Vulkan::Vulkan)
 if (MSVC)
 	target_compile_options(Jubes PRIVATE /W4)
