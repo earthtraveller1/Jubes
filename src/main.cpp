@@ -1,6 +1,7 @@
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 
+#include "buffers.hpp"
 #include "devices.hpp"
 #include "graphics.hpp"
 #include "present.hpp"
@@ -30,6 +31,7 @@ int main() try {
     }
 
     Device device{window, true};
+    CommandPool command_pool{device};
     Swapchain swapchain{device, window};
 
     RenderPass render_pass{device, swapchain};
@@ -38,6 +40,17 @@ int main() try {
         device, render_pass, "shaders/main.vert.spv", "shaders/main.frag.spv",
         {},     {},
     };
+
+    std::array<Vertex, 3> vertices = {
+        Vertex{{0.0, 0.5, 0.0}},
+        Vertex{{0.5, 0.5, 0.0}},
+        Vertex{{-0.5, 0.5, 0.0}},
+    };
+
+    Buffer buffer{device, vertices.size() * sizeof(vertices[0]),
+                  Buffer::Type::Vertex};
+    buffer.load_using_staging(command_pool, vertices.data(),
+                              vertices.size() * sizeof(vertices[0]));
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
