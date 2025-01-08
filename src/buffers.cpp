@@ -11,21 +11,21 @@ Buffer::Buffer(
         .usage =
             [&]() {
                 switch (type) {
-                case Type::vertex:
+                case Type::Vertex:
                     return static_cast<VkBufferUsageFlags>(
                         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
                         VK_BUFFER_USAGE_TRANSFER_DST_BIT
                     );
-                case Type::index:
+                case Type::Index:
                     return static_cast<VkBufferUsageFlags>(
                         VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
                         VK_BUFFER_USAGE_TRANSFER_DST_BIT
                     );
-                case Type::staging:
+                case Type::Staging:
                     return static_cast<VkBufferUsageFlags>(
                         VK_BUFFER_USAGE_TRANSFER_SRC_BIT
                     );
-                case Type::uniform:
+                case Type::Uniform:
                     return static_cast<VkBufferUsageFlags>(
                         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
                     );
@@ -55,20 +55,20 @@ Buffer::Buffer(
 
     VkMemoryPropertyFlags memory_property_flags = [&]() {
         switch (type) {
-        case Type::vertex:
+        case Type::Vertex:
             return static_cast<VkMemoryPropertyFlags>(
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
             );
-        case Type::index:
+        case Type::Index:
             return static_cast<VkMemoryPropertyFlags>(
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
             );
-        case Type::staging:
+        case Type::Staging:
             return static_cast<VkMemoryPropertyFlags>(
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
             );
-        case Type::uniform:
+        case Type::Uniform:
             return static_cast<VkMemoryPropertyFlags>(
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
@@ -166,4 +166,15 @@ auto Buffer::copy_from(const Buffer &other, VkCommandPool command_pool)
     VK_ERROR(
         vkQueueSubmit(device.get_graphics_queue(), 1, &submit_info, VK_NULL_HANDLE)
     );
+}
+
+auto Buffer::load_using_staging(
+    VkCommandPool p_command_pool, const void *p_data, VkDeviceSize size
+) -> void {
+    StagingBuffer staging_buffer{device, size};
+    const auto data = staging_buffer.map_memory();
+    memcpy(data, p_data, size);
+    staging_buffer.unmap_memory();
+    copy_from(staging_buffer.get(), p_command_pool);
+    vkQueueWaitIdle(device.get_graphics_queue());
 }
