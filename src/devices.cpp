@@ -247,3 +247,29 @@ Device::~Device() {
         vkDestroyInstance(instance, nullptr);
     }
 }
+
+CommandPool::CommandPool(const Device &device): device(device) {
+    const VkCommandPoolCreateInfo pool_info{
+        .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
+        .pNext = nullptr,
+        .flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
+        .queueFamilyIndex = device.get_graphics_family(),
+    };
+
+    VkCommandPool pool;
+    VK_ERROR(vkCreateCommandPool(device.get(), &pool_info, nullptr, &pool));
+}
+
+auto CommandPool::allocate_buffer() const -> VkCommandBuffer {
+    VkCommandBufferAllocateInfo alloc_info{
+        .sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
+        .pNext = nullptr,
+        .commandPool = pool,
+        .level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
+        .commandBufferCount = 1,
+    };
+
+    VkCommandBuffer buffer;
+    VK_ERROR(vkAllocateCommandBuffers(device.get(), &alloc_info, &buffer));
+    return buffer;
+}

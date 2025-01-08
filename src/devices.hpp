@@ -35,3 +35,18 @@ class Device {
     VkQueue graphics_queue;
     VkQueue present_queue;
 };
+
+struct CommandPool {
+    VkCommandPool pool;
+    const Device &device;
+
+    CommandPool(const Device &p_device);
+
+    NO_COPY(CommandPool);
+
+    auto allocate_buffer() const -> VkCommandBuffer; 
+
+    inline ~CommandPool() {
+        vkDestroyCommandPool(device.get(), pool, nullptr);
+    }
+};
