@@ -256,7 +256,6 @@ CommandPool::CommandPool(const Device &device): device(device) {
         .queueFamilyIndex = device.get_graphics_family(),
     };
 
-    VkCommandPool pool;
     VK_ERROR(vkCreateCommandPool(device.get(), &pool_info, nullptr, &pool));
 }
 

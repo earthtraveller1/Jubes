@@ -1,7 +1,7 @@
 #include "buffers.hpp"
 
 Buffer::Buffer(const Device &device, VkDeviceSize size, Type type)
-    : device(device) {
+    : size(size), device(device) {
     const VkBufferCreateInfo buffer_create_info{
         .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
         .pNext = nullptr,
@@ -31,7 +31,6 @@ Buffer::Buffer(const Device &device, VkDeviceSize size, Type type)
         .pQueueFamilyIndices = nullptr,
     };
 
-    VkBuffer buffer;
     auto result =
         vkCreateBuffer(device.get(), &buffer_create_info, nullptr, &buffer);
 
@@ -94,7 +93,6 @@ Buffer::Buffer(const Device &device, VkDeviceSize size, Type type)
         .memoryTypeIndex = memory_type_index.value(),
     };
 
-    VkDeviceMemory memory;
     VK_ERROR(vkAllocateMemory(device.get(), &memory_allocate_info, nullptr,
                               &memory));
 

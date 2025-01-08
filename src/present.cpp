@@ -155,6 +155,7 @@ Swapchain::Swapchain(const Device &p_device, GLFWwindow *p_window)
     }
 
     image_format = surface_format.format;
+    extent = swap_extent; 
 }
 
 Swapchain::~Swapchain() {
