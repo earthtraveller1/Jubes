@@ -11,9 +11,9 @@ class Buffer {
     NO_COPY(Buffer);
 
     void copy_from(const Buffer &other,
-                   VkCommandPool command_buffer) const;
+                   const CommandPool &command_buffer) const;
 
-    void load_using_staging(VkCommandPool command_pool, const void *data,
+    void load_using_staging(const CommandPool &command_pool, const void *data,
                             VkDeviceSize size);
 
     inline VkBuffer get() const { return buffer; }
@@ -42,11 +42,12 @@ class StagingBuffer {
     StagingBuffer(const Device &device, VkDeviceSize size)
         : buffer(device, size, Buffer::Type::Staging) {}
 
-    inline const Buffer& get() const { return buffer; }
+    inline const Buffer &get() const { return buffer; }
 
-    inline void* map_memory() {
+    inline void *map_memory() {
         void *data;
-        vkMapMemory(buffer.get_device().get(), buffer.get_memory(), 0, buffer.get_size(), 0, &data);
+        vkMapMemory(buffer.get_device().get(), buffer.get_memory(), 0,
+                    buffer.get_size(), 0, &data);
         return data;
     }
 
