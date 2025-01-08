@@ -21,6 +21,8 @@ class Device {
 
     inline uint32_t get_present_family() const { return present_family; }
 
+    inline VkQueue get_graphics_queue() const { return graphics_queue; }
+
     ~Device();
 
   private:
