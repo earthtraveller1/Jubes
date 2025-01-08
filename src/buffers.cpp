@@ -1,7 +1,7 @@
 #include "buffers.hpp"
 
 Buffer::Buffer(
-    const Device &device, VkDeviceSize size, type_t type
+    const Device &device, VkDeviceSize size, Type type
 ): device(device) {
     const VkBufferCreateInfo buffer_create_info{
         .sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO,
@@ -11,21 +11,21 @@ Buffer::Buffer(
         .usage =
             [&]() {
                 switch (type) {
-                case type_t::vertex:
+                case Type::vertex:
                     return static_cast<VkBufferUsageFlags>(
                         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT |
                         VK_BUFFER_USAGE_TRANSFER_DST_BIT
                     );
-                case type_t::index:
+                case Type::index:
                     return static_cast<VkBufferUsageFlags>(
                         VK_BUFFER_USAGE_INDEX_BUFFER_BIT |
                         VK_BUFFER_USAGE_TRANSFER_DST_BIT
                     );
-                case type_t::staging:
+                case Type::staging:
                     return static_cast<VkBufferUsageFlags>(
                         VK_BUFFER_USAGE_TRANSFER_SRC_BIT
                     );
-                case type_t::uniform:
+                case Type::uniform:
                     return static_cast<VkBufferUsageFlags>(
                         VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT
                     );
@@ -55,20 +55,20 @@ Buffer::Buffer(
 
     VkMemoryPropertyFlags memory_property_flags = [&]() {
         switch (type) {
-        case type_t::vertex:
+        case Type::vertex:
             return static_cast<VkMemoryPropertyFlags>(
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
             );
-        case type_t::index:
+        case Type::index:
             return static_cast<VkMemoryPropertyFlags>(
                 VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT
             );
-        case type_t::staging:
+        case Type::staging:
             return static_cast<VkMemoryPropertyFlags>(
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
             );
-        case type_t::uniform:
+        case Type::uniform:
             return static_cast<VkMemoryPropertyFlags>(
                 VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT |
                 VK_MEMORY_PROPERTY_HOST_COHERENT_BIT
