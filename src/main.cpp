@@ -1,9 +1,8 @@
-#include <iostream>
-
 #include <GLFW/glfw3.h>
 #include <fmt/format.h>
 
 #include "devices.hpp"
+#include "graphics.hpp"
 #include "present.hpp"
 
 constexpr auto WINDOW_WIDTH = 1280;
@@ -32,6 +31,13 @@ int main() try {
 
     Device device{window, true};
     Swapchain swapchain{device, window};
+
+    RenderPass render_pass{device, swapchain};
+    Framebuffers framebuffers{device, swapchain, render_pass};
+    GraphicsPipeline pipeline{
+        device, render_pass, "shaders/main.vert.spv", "shaders/main.frag.spv",
+        {},     {},
+    };
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
