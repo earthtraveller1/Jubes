@@ -25,7 +25,7 @@ private:
 
 struct Fence {
 public:
-    Fence(const Device& device);
+    Fence(const Device& device, bool signaled);
     NO_COPY(Fence);
     
     inline VkFence get() const {
