@@ -8,6 +8,8 @@ class Swapchain {
     Swapchain(const Device &device, GLFWwindow *window);
 
     NO_COPY(Swapchain)
+    
+    inline VkSwapchainKHR get() const { return swapchain; }
 
     inline VkFormat get_format() const { return image_format; }
 
