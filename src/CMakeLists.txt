@@ -7,6 +7,7 @@ target_sources(
     "graphics.cpp"
 	"main.cpp"
 	"present.cpp"
+	"sync.cpp"
 
     "buffers.hpp"
 	"common.hpp"
@@ -14,6 +15,7 @@ target_sources(
     "graphics.hpp"
 	"precompiled.hpp"
 	"present.hpp"
+	"sync.hpp"
 )
 
 target_precompile_headers(Jubes PRIVATE precompiled.hpp)
