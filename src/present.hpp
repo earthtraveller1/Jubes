@@ -3,12 +3,30 @@
 #include "common.hpp"
 #include "devices.hpp"
 
+struct Semaphore;
+
 class Swapchain {
   public:
-    Swapchain(const Device &device, GLFWwindow *window);
+    inline Swapchain(const Device &device, GLFWwindow *window) : device(device) {
+        create(device, window);
+    }
+
+    void create(const Device &device, GLFWwindow *window);
+
+    void destroy();
+
+    struct AcquiredImage {
+        uint32_t image_index;
+        bool should_recreate;
+    };
+
+    // @returns two values.
+    // first value is the image index
+    // second value indicates whether the swapchain should be recreated or not
+    AcquiredImage acquire_image(const Semaphore& signal_semaphore);
 
     NO_COPY(Swapchain)
-    
+
     inline VkSwapchainKHR get() const { return swapchain; }
 
     inline VkFormat get_format() const { return image_format; }
@@ -17,9 +35,11 @@ class Swapchain {
         return image_views;
     }
 
-    inline const VkExtent2D& get_extent() const { return extent; }
+    inline const VkExtent2D &get_extent() const { return extent; }
 
-    ~Swapchain();
+    inline ~Swapchain() {
+        destroy();
+    }
 
   private:
     const Device &device;

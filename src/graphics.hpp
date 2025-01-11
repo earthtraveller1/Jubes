@@ -26,16 +26,24 @@ class RenderPass {
 struct Framebuffers {
   public:
     Framebuffers(const Device &device, const Swapchain &swapchain,
-                 const RenderPass &render_pass);
+                 const RenderPass &render_pass): device(device) {
+        create(device, swapchain, render_pass);
+    }
+
+    void create(const Device &device, const Swapchain &swapchain, const RenderPass &render_pass);
 
     inline VkFramebuffer get(size_t i) const { return framebuffers.at(i); }
 
     NO_COPY(Framebuffers);
 
-    inline ~Framebuffers() {
+    inline void destroy() {
         for (const auto fb : framebuffers) {
             vkDestroyFramebuffer(device.get(), fb, nullptr);
         }
+    }
+
+    inline ~Framebuffers() {
+        destroy();
     }
 
   private:

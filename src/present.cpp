@@ -1,7 +1,8 @@
+#include "sync.hpp"
+
 #include "present.hpp"
 
-Swapchain::Swapchain(const Device &p_device, GLFWwindow *p_window)
-    : device(p_device) {
+void Swapchain::create(const Device &p_device, GLFWwindow *p_window) {
     VkSurfaceCapabilitiesKHR surface_capabilities;
     vkGetPhysicalDeviceSurfaceCapabilitiesKHR(
         p_device.get_physical(), p_device.get_surface(), &surface_capabilities);
@@ -155,13 +156,35 @@ Swapchain::Swapchain(const Device &p_device, GLFWwindow *p_window)
     }
 
     image_format = surface_format.format;
-    extent = swap_extent; 
+    extent = swap_extent;
 }
 
-Swapchain::~Swapchain() {
+void Swapchain::destroy() {
     for (const auto view : image_views) {
         vkDestroyImageView(device.get(), view, nullptr);
     }
 
     vkDestroySwapchainKHR(device.get(), swapchain, nullptr);
+}
+
+Swapchain::AcquiredImage Swapchain::acquire_image(const Semaphore& signal_semaphore) {
+    uint32_t image_index = 0;
+    const auto result = vkAcquireNextImageKHR(device.get(), swapchain, UINT64_MAX,
+                                        signal_semaphore.get(),
+                                        VK_NULL_HANDLE, &image_index);
+
+    if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+        return {
+            .image_index = image_index,
+            .should_recreate = true,
+        };
+    } else if (result != VK_SUCCESS) {
+        fmt::println("[ERROR]: Failed to acquire the next image from the swapchain: {}", result);
+        throw Error::VulkanError;
+    } else {
+        return {
+            .image_index = image_index,
+            .should_recreate = false,
+        };
+    }
 }

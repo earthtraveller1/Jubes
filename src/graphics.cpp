@@ -56,8 +56,7 @@ RenderPass::RenderPass(const Device &p_device, const Swapchain &p_swapchain)
 }
 
 void RenderPass::begin(VkCommandBuffer command_buffer,
-                       const Swapchain &swapchain,
-                       VkFramebuffer framebuffer,
+                       const Swapchain &swapchain, VkFramebuffer framebuffer,
                        glm::vec4 clear_color) const {
 
     const VkClearValue clear_value{
@@ -95,9 +94,8 @@ void RenderPass::begin(VkCommandBuffer command_buffer,
                          VK_SUBPASS_CONTENTS_INLINE);
 }
 
-Framebuffers::Framebuffers(const Device &p_device, const Swapchain &p_swapchain,
-                           const RenderPass &p_render_pass)
-    : device(p_device) {
+void Framebuffers::create(const Device &p_device, const Swapchain &p_swapchain,
+                          const RenderPass &p_render_pass) {
     framebuffers.reserve(p_swapchain.get_image_views().size());
 
     for (const auto image_view : p_swapchain.get_image_views()) {
