@@ -1,3 +1,5 @@
+#include "present.hpp"
+
 #include "devices.hpp"
 
 namespace {
@@ -218,6 +220,53 @@ Device::Device(GLFWwindow *const p_window, bool p_enable_validation) {
     vkGetDeviceQueue(device, present_family, 0, &present_queue);
 }
 
+void Device::submit_to_graphics(VkCommandBuffer command_buffer,
+                                const Semaphore &wait_semaphore,
+                                const Semaphore &signal_semaphore,
+                                const Fence &fence) const {
+
+    const auto wait_semaphore_raw = wait_semaphore.get();
+    const auto signal_semaphore_raw = signal_semaphore.get();
+
+    const VkPipelineStageFlags wait_stage =
+        VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+
+    const VkSubmitInfo submit_info{
+        .sType = VK_STRUCTURE_TYPE_SUBMIT_INFO,
+        .pNext = nullptr,
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores = &wait_semaphore_raw,
+        .pWaitDstStageMask = &wait_stage,
+        .commandBufferCount = 1,
+        .pCommandBuffers = &command_buffer,
+        .signalSemaphoreCount = 1,
+        .pSignalSemaphores = &signal_semaphore_raw,
+    };
+
+    VK_ERROR(vkQueueSubmit(graphics_queue, 1, &submit_info, fence.get()));
+}
+
+void Device::present(const Swapchain &swapchain,
+                     const Semaphore &wait_semaphore,
+                     uint32_t image_index) const {
+
+    const auto wait_semaphore_raw = wait_semaphore.get();
+    const auto swapchain_raw = swapchain.get();
+
+    const VkPresentInfoKHR present_info{
+        .sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+        .pNext = nullptr,
+        .waitSemaphoreCount = 1,
+        .pWaitSemaphores = &wait_semaphore_raw,
+        .swapchainCount = 1,
+        .pSwapchains = &swapchain_raw,
+        .pImageIndices = &image_index,
+        .pResults = nullptr,
+    };
+
+    VK_ERROR(vkQueuePresentKHR(present_queue, &present_info));
+}
+
 Device &Device::operator=(Device &&rhs) noexcept {
     instance = rhs.instance;
     surface = rhs.surface;
@@ -248,7 +297,7 @@ Device::~Device() {
     }
 }
 
-CommandPool::CommandPool(const Device &device): device(device) {
+CommandPool::CommandPool(const Device &device) : device(device) {
     const VkCommandPoolCreateInfo pool_info{
         .sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
         .pNext = nullptr,

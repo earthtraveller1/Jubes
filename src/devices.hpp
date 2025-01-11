@@ -3,11 +3,14 @@
 #include <GLFW/glfw3.h>
 
 #include "common.hpp"
+#include "sync.hpp"
+
+class Swapchain;
 
 class Device {
   public:
     Device(GLFWwindow *const window, bool enable_validation);
-    Device &operator=(Device&& rhs) noexcept;
+    Device &operator=(Device &&rhs) noexcept;
 
     NO_COPY(Device);
 
@@ -22,8 +25,16 @@ class Device {
     inline uint32_t get_present_family() const { return present_family; }
 
     inline VkQueue get_graphics_queue() const { return graphics_queue; }
-    
+
     inline VkQueue get_present_queue() const { return present_queue; }
+
+    void submit_to_graphics(VkCommandBuffer command_buffer,
+                            const Semaphore &wait_semaphore,
+                            const Semaphore &signal_semaphore,
+                            const Fence &fence) const;
+
+    void present(const Swapchain &swapchain, const Semaphore &wait_semaphore,
+                 uint32_t image_index) const;
 
     ~Device();
 
@@ -46,9 +57,7 @@ struct CommandPool {
 
     NO_COPY(CommandPool);
 
-    auto allocate_buffer() const -> VkCommandBuffer; 
+    auto allocate_buffer() const -> VkCommandBuffer;
 
-    inline ~CommandPool() {
-        vkDestroyCommandPool(device.get(), pool, nullptr);
-    }
+    inline ~CommandPool() { vkDestroyCommandPool(device.get(), pool, nullptr); }
 };
