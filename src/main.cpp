@@ -80,30 +80,8 @@ int main() try {
 
         VK_ERROR(vkBeginCommandBuffer(command_buffer, &begin_info));
 
-        const VkClearValue clear_value{
-            .color = {.float32 = {1.0, 0.5, 0.5, 1.0}}};
-
-        const VkRenderPassBeginInfo render_pass_begin_info{
-            .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
-            .pNext = nullptr,
-            .renderPass = render_pass.get(),
-            .framebuffer = framebuffers.get(image_index),
-            .renderArea =
-                VkRect2D{
-                    .offset =
-                        VkOffset2D{
-                            .x = 0,
-                            .y = 0,
-                        },
-                    .extent = swapchain.get_extent(),
-                },
-            .clearValueCount = 1,
-            .pClearValues = &clear_value,
-        };
-
-        vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info,
-                             VK_SUBPASS_CONTENTS_INLINE);
-
+        render_pass.begin(command_buffer, swapchain,
+                          framebuffers.get(image_index), {1.0, 0.5, 0.5, 1.0});
         vkCmdEndRenderPass(command_buffer);
 
         vkEndCommandBuffer(command_buffer);

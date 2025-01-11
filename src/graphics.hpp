@@ -11,6 +11,8 @@ class RenderPass {
 
     inline VkRenderPass get() const { return render_pass; }
 
+    void begin(VkCommandBuffer command_buffer, const Swapchain& swapchain, VkFramebuffer framebuffer, glm::vec4 clear_color) const;
+
     inline ~RenderPass() {
         vkDestroyRenderPass(device.get(), render_pass, nullptr);
     }

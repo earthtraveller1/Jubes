@@ -55,6 +55,46 @@ RenderPass::RenderPass(const Device &p_device, const Swapchain &p_swapchain)
     }
 }
 
+void RenderPass::begin(VkCommandBuffer command_buffer,
+                       const Swapchain &swapchain,
+                       VkFramebuffer framebuffer,
+                       glm::vec4 clear_color) const {
+
+    const VkClearValue clear_value{
+        .color =
+            {
+                .float32 =
+                    {
+                        clear_color.r,
+                        clear_color.g,
+                        clear_color.b,
+                        clear_color.a,
+                    },
+            },
+    };
+
+    const VkRenderPassBeginInfo render_pass_begin_info{
+        .sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
+        .pNext = nullptr,
+        .renderPass = render_pass,
+        .framebuffer = framebuffer,
+        .renderArea =
+            VkRect2D{
+                .offset =
+                    VkOffset2D{
+                        .x = 0,
+                        .y = 0,
+                    },
+                .extent = swapchain.get_extent(),
+            },
+        .clearValueCount = 1,
+        .pClearValues = &clear_value,
+    };
+
+    vkCmdBeginRenderPass(command_buffer, &render_pass_begin_info,
+                         VK_SUBPASS_CONTENTS_INLINE);
+}
+
 Framebuffers::Framebuffers(const Device &p_device, const Swapchain &p_swapchain,
                            const RenderPass &p_render_pass)
     : device(p_device) {
