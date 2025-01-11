@@ -3,9 +3,10 @@
 #include <GLFW/glfw3.h>
 
 #include "common.hpp"
-#include "sync.hpp"
 
 class Swapchain;
+struct Semaphore;
+struct Fence;
 
 class Device {
   public:
