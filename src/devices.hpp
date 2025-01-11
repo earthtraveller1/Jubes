@@ -34,7 +34,8 @@ class Device {
                             const Semaphore &signal_semaphore,
                             const Fence &fence) const;
 
-    void present(const Swapchain &swapchain, const Semaphore &wait_semaphore,
+    // returns - whether you should recreate the swapchain or not.
+    bool present(const Swapchain &swapchain, const Semaphore &wait_semaphore,
                  uint32_t image_index) const;
 
     ~Device();

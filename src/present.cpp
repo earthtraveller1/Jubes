@@ -164,6 +164,9 @@ void Swapchain::destroy() {
         vkDestroyImageView(device.get(), view, nullptr);
     }
 
+    image_views.clear();
+    images.clear();
+
     vkDestroySwapchainKHR(device.get(), swapchain, nullptr);
 }
 

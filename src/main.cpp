@@ -10,6 +10,19 @@
 constexpr auto WINDOW_WIDTH = 1280;
 constexpr auto WINDOW_HEIGHT = 720;
 
+namespace {
+void recreate_swapchain_and_framebuffers(const Device &device,
+                                         GLFWwindow *window,
+                                         const RenderPass &render_pass,
+                                         Swapchain &swapchain,
+                                         Framebuffers &framebuffers) {
+    framebuffers.destroy();
+    swapchain.destroy();
+    swapchain.create(device, window);
+    framebuffers.create(device, swapchain, render_pass);
+}
+} // namespace
+
 int main() try {
     if (!glfwInit()) {
         fmt::println("Failed to initialize GLFW.");
@@ -20,7 +33,7 @@ int main() try {
         fmt::println("[GLFW Error {}]: {}", error_code, description);
     });
 
-    glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+    // glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
     const auto window = glfwCreateWindow(WINDOW_WIDTH, WINDOW_HEIGHT, "Jubes",
@@ -64,10 +77,16 @@ int main() try {
         vkWaitForFences(device.get(), 1, &frame_fence_raw, VK_TRUE, UINT64_MAX);
         vkResetFences(device.get(), 1, &frame_fence_raw);
 
-        uint32_t image_index;
-        VK_ERROR(vkAcquireNextImageKHR(
-            device.get(), swapchain.get(), UINT64_MAX,
-            image_acquired_semaphore.get(), VK_NULL_HANDLE, &image_index));
+        auto [image_index, should_recreate] = swapchain.acquire_image(image_acquired_semaphore);
+        if (should_recreate) {
+            vkDeviceWaitIdle(device.get());
+            framebuffers.destroy();
+            swapchain.destroy();
+            swapchain.create(device, window);
+            framebuffers.create(device, swapchain, render_pass);
+
+            continue;
+        }
 
         vkResetCommandBuffer(command_buffer, 0);
 
@@ -88,7 +107,14 @@ int main() try {
 
         device.submit_to_graphics(command_buffer, image_acquired_semaphore,
                                   rendering_done_semaphore, frame_fence);
-        device.present(swapchain, rendering_done_semaphore, image_index);
+        should_recreate = device.present(swapchain, rendering_done_semaphore, image_index);
+        if (should_recreate) {
+            vkDeviceWaitIdle(device.get());
+            framebuffers.destroy();
+            swapchain.destroy();
+            swapchain.create(device, window);
+            framebuffers.create(device, swapchain, render_pass);
+        }
 
         glfwPollEvents();
     }

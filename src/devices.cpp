@@ -247,7 +247,7 @@ void Device::submit_to_graphics(VkCommandBuffer command_buffer,
     VK_ERROR(vkQueueSubmit(graphics_queue, 1, &submit_info, fence.get()));
 }
 
-void Device::present(const Swapchain &swapchain,
+bool Device::present(const Swapchain &swapchain,
                      const Semaphore &wait_semaphore,
                      uint32_t image_index) const {
 
@@ -265,7 +265,15 @@ void Device::present(const Swapchain &swapchain,
         .pResults = nullptr,
     };
 
-    VK_ERROR(vkQueuePresentKHR(present_queue, &present_info));
+    const auto result = vkQueuePresentKHR(present_queue, &present_info);
+    if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR) {
+        return true;
+    } else if (result != VK_SUCCESS) {
+        fmt::println("[ERROR]: Failed to present to the screen: {}", result);
+        throw Error::VulkanError;
+    } else {
+        return false;
+    }
 }
 
 Device &Device::operator=(Device &&rhs) noexcept {

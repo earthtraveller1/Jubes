@@ -40,6 +40,8 @@ struct Framebuffers {
         for (const auto fb : framebuffers) {
             vkDestroyFramebuffer(device.get(), fb, nullptr);
         }
+
+        framebuffers.clear();
     }
 
     inline ~Framebuffers() {
