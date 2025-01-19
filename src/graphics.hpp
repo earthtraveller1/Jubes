@@ -65,6 +65,8 @@ class GraphicsPipeline {
 
     NO_COPY(GraphicsPipeline);
 
+    inline VkPipeline get() const { return pipeline; }
+
     inline ~GraphicsPipeline() {
         vkDestroyPipelineLayout(device.get(), layout, nullptr);
         vkDestroyPipeline(device.get(), pipeline, nullptr);
